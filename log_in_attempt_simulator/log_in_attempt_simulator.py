@@ -279,9 +279,11 @@ class LogInAttemptSimulator:
             poisson_lambda = random.uniform(1.5, 2.25)
 
         hourly_arrivals = np.random.poisson(poisson_lambda)
-        interarrival_time = np.random.exponential(1/poisson_lambda)
+        interarrival_times = np.random.exponential(
+            1/poisson_lambda, size=hourly_arrivals
+        )
 
-        return hourly_arrivals, interarrival_time
+        return hourly_arrivals, interarrival_times
 
     def _hack(self, when, user_list):
         """
@@ -328,13 +330,13 @@ class LogInAttemptSimulator:
                 )
 
             # simulate valid users
-            hourly_arrivals, interarrival_time = self._valid_user_arrivals(current)
+            hourly_arrivals, interarrival_times = self._valid_user_arrivals(current)
 
             random_user = random.choice(self.users)
             random_ip = random.choice(self.userbase[random_user])
 
             for i in range(hourly_arrivals):
-                current += dt.timedelta(hours=interarrival_time)
+                current += dt.timedelta(hours=interarrival_times[i])
                 current = self._valid_user_attempts_login(current, random_user)
 
     @staticmethod
