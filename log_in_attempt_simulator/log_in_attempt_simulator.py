@@ -338,14 +338,14 @@ class LogInAttemptSimulator:
                 current = self._valid_user_attempts_login(current, random_user)
 
     @staticmethod
-    def _save(data, filename):
+    def _save(data, filename, sort_column):
         """Sort a pandas DataFrame by the datetime and save to a CSV."""
-        data.sort_values('datetime').to_csv(filename, index=False)
+        data.sort_values(sort_column).to_csv(filename, index=False)
 
     def save_log(self, filename):
         """Save the log in attempts log to a CSV file."""
-        self._save(self.log, filename)
+        self._save(self.log, filename, 'datetime')
 
     def save_hack_log(self, filename):
         """Save the record of the attacks to a CSV file."""
-        self._save(self.hack_log, filename)
+        self._save(self.hack_log, filename, 'start')
