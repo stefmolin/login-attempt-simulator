@@ -11,6 +11,7 @@ Simulation of regular log in activity on a site and random activity from hackers
 - Each hacker will use a single IP address which is generated in the same way the valid user ones are.
 - Both valid users and hackers can make mistakes typing the user names--either forgetting a character or replacing a character with lowercase letter.
 - Valid users are more likely to get their passwords and usernames correct than the hackers.
+- Although highly unlikely, it is possible the hacker has the same IP as a valid user. The hacker may even be a valid user!
 
 ## Setup
 ```
