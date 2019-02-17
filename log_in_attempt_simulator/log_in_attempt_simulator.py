@@ -1,0 +1,351 @@
+"""Simulator of log in attempts from valid users and hackers."""
+
+import calendar
+import datetime as dt
+from functools import partial
+import math
+import random
+import string
+
+import numpy as np
+import pandas as pd
+
+from .utils import random_ip_generator, read_user_ips
+
+class LogInAttemptSimulator:
+    """
+    Class for simulating log in attempts from valid and nefarious users.
+
+    Class attributes:
+        - ATTEMPTS_BEFORE_LOCKOUT: Number of consecutive failed attempts
+                                   before lockout.
+        - ACCOUNT_LOCKED: Error message for log when account is locked.
+        - WRONG_USERNAME: Error message for log when username is wrong.
+        - WRONG_PASSWORD: Error message for log when password is wrong.
+
+    Instance attributes:
+        - userbase: Dictionary mapping usernames to their IP addresses.
+        - users: The list of usernames in the userbase.
+        - start: The start datetime for the simulation.
+        - end: The end datetime for the simulation.
+        - hacker_success_likelihoods: List of probabilities of successful log
+                                      in for hacker. Length of this list is
+                                      also max attempts hacker will make per
+                                      user attempted.
+        - valid_user_success_likelihoods: List of probabilities of successful
+                                          log in for valid users. Length of
+                                          this list is also max attempts user
+                                          will make.
+        - log: Pandas DataFrame recording all log in attempts and their outcome.
+        - hack_log: Pandas DataFrame recording when attacks occurred.
+        - locked_accounts: List of accounts currently locked.
+    """
+
+    ATTEMPTS_BEFORE_LOCKOUT = 3
+    ACCOUNT_LOCKED = 'error_account_locked'
+    WRONG_USERNAME = 'error_wrong_username'
+    WRONG_PASSWORD = 'error_wrong_password'
+
+    def __init__(self, userbase_json_file, start, end=None, *,
+                 hacker_success_likelihoods=[.25, .45],
+                 valid_user_success_likelihoods=[.75, .8, .5]
+                ):
+        """
+        Create a simulator.
+
+        Parameters:
+            - userbase_json_file: The JSON file name of the mapping of
+                                  usernames to their IPs.
+            - start: The start datetime for the simulation.
+            - end: The end datetime for the simulation.
+            - hacker_success_likelihoods: List of probabilities of successful log
+                                          in for hacker. Length of this list is
+                                          also max attempts hacker will make per
+                                          user attempted.
+            - valid_user_success_likelihoods: List of probabilities of successful
+                                              log in for valid users. Length of
+                                              this list is also max attempts user
+                                              will make.
+
+        Returns:
+            A LogInAttemptSimulator object.
+        """
+        self.userbase = read_user_ips(userbase_json_file) # user, ip dict
+        self.users = [user for user in self.userbase.keys()]
+
+        self.start = start
+        self.end = end if end else self.start + dt.timedelta(
+            days=random.uniform(1, 50)
+        )
+
+        self.hacker_success_likelihoods = hacker_success_likelihoods
+        self.valid_user_success_likelihoods = valid_user_success_likelihoods
+
+        self.log = pd.DataFrame(
+            columns=[
+                'datetime', 'source_ip', 'username',
+                'success', 'failure_reason'
+            ]
+        )
+        self.hack_log = pd.DataFrame(
+            columns=['start', 'end', 'source_ip']
+        )
+
+        self.locked_accounts = []
+
+    def _record(self, when, source_ip, username, success, failure_reason):
+        """
+        Record the outcome of a log in attempt.
+
+        Parameters:
+            - when: The datetime of the event.
+            - source_ip: The IP where the attempt came from.
+            - username: The username used in the attempt.
+            - success: Whether or not the attempt succeeded (boolean).
+            - failure_reason: The reason for the failure, if failed.
+
+        Returns:
+            None, the `log` attribute is updated.
+        """
+        self.log = self.log.append({
+            'datetime' : when,
+            'source_ip' : source_ip,
+            'username' : username,
+            'success' : success,
+            'failure_reason' : failure_reason
+        }, ignore_index=True)
+
+    def _hacker_attempts_login(self, when, source_ip, username):
+        """
+        Simulates a log in attempt from a attacker.
+
+        Parameters:
+            - when: The datetime to start trying.
+            - source_ip: The IP where the attempt is coming from.
+            - username: The username being used in the attempt.
+
+        Returns:
+            The datetime after trying.
+        """
+        return self._attempt_login(
+            when=when,
+            source_ip=source_ip,
+            username=username,
+            user_name_accuracy=random.gauss(mu=0.35, sigma=0.5),
+            success_likelihoods=self.hacker_success_likelihoods
+        )
+
+    def _valid_user_attempts_login(self, when, username):
+        """
+        Simulates a log in attempt from a valid user.
+
+        Parameters:
+        - when: The datetime to start trying.
+        - source_ip: The IP where the attempt is coming from.
+        - username: The username being used in the attempt.
+
+        Returns:
+            The datetime after trying.
+        """
+        return self._attempt_login(
+            when=when,
+            source_ip=random.choice(self.userbase[username]),
+            username=username,
+            user_name_accuracy=random.gauss(mu=0.8, sigma=0.1),
+            success_likelihoods=self.valid_user_success_likelihoods
+        )
+
+    def _attempt_login(self, when, source_ip, username,
+                       user_name_accuracy, success_likelihoods
+                      ):
+        """
+        Simulates a log in attempt, allowing for account lockouts, and
+        recording the results.
+
+        Parameters:
+            - when: The datetime to start trying.
+            - source_ip: The IP where the attempt is coming from.
+            - username: The username being used in the attempt.
+            - user_name_accuracy: The probability the username is correct.
+            - success_likelihoods: A list of the probablities of the password
+                                   being correct. The number of attempts to
+                                   log in will be equal to the length of this
+                                   list.
+
+        Returns:
+            The datetime after trying.
+        """
+        current = when
+        recorder = partial(self._record, source_ip=source_ip)
+
+        if random.random() > user_name_accuracy:
+            # username will be provided incorrectly
+            correct_username = username
+            username = self._distort_username(username)
+
+        if username not in self.locked_accounts:
+            tries = len(success_likelihoods)
+            for i in range(min(tries, self.ATTEMPTS_BEFORE_LOCKOUT)):
+                current += dt.timedelta(seconds=1)
+
+                if username not in self.users:
+                    recorder(
+                        when=current,
+                        username=username,
+                        success=False,
+                        failure_reason=self.WRONG_USERNAME
+                    )
+                    if random.random() <= user_name_accuracy:
+                        # corrects username
+                        username = correct_username
+                    continue
+
+                probability_success = random.random()
+                if random.random() < success_likelihoods[i]:
+                    # successfully logs in
+                    recorder(
+                        when=current,
+                        username=username,
+                        success=True,
+                        failure_reason=None
+                    )
+                    break
+                else:
+                    recorder(
+                        when=current,
+                        username=username,
+                        success=False,
+                        failure_reason=self.WRONG_PASSWORD
+                    )
+            else:
+                # lock user out if max attempts was exceeded
+                # (has to fail to get here)
+                if tries >= self.ATTEMPTS_BEFORE_LOCKOUT and username in self.users:
+                    self.locked_accounts.append(username)
+        else:
+            recorder(
+                when=current,
+                username=username,
+                success=False,
+                failure_reason=self.ACCOUNT_LOCKED
+            )
+            # unlock the account randomly
+            if random.random() >= .5:
+                self.locked_accounts.remove(username)
+        return current
+
+    @staticmethod
+    def _distort_username(username):
+        """
+        Alters the username to allow for wrong username login failures.
+        Randomly removes a letter or replaces a letter in a valid username.
+        """
+        username = list(username)
+        change_index = random.randint(0, len(username) - 1)
+        if random.random() < .5:
+            # remove random letter
+            username.pop(change_index)
+        else:
+            # randomly replace a single letter
+            username[change_index] = random.choice(string.ascii_lowercase)
+        return ''.join(username)
+
+    @staticmethod
+    def _valid_user_arrivals(when):
+        """
+        Static method for simulating the Poisson process of arrivals
+        (users wanting to log in to the website). Lambda for the Poisson
+        varies depending upon the day and time of week.
+
+        Parameters:
+            - when: The datetime to determine hourly arrivals
+                    and interarrival time for.
+
+        Returns:
+            The arrivals in that given hour and the interarrival time,
+            which could put the arrivals outside the hour itself.
+        """
+        is_weekday = when.weekday() not in (calendar.SATURDAY, calendar.SUNDAY)
+        late_night = when.hour < 5 or when.hour >= 11
+        work_time = is_weekday and (when.hour >= 9 or when.hour <= 17)
+
+        if work_time:
+            # hours 9-5 on work days get higher lambda concentrated near 2.75
+            poisson_lambda = random.triangular(1.5, 2.75, 5)
+        elif late_night:
+            # hours in middle of night get lower lambda
+            poisson_lambda = random.uniform(0.0, 1.0)
+        else:
+            poisson_lambda = random.uniform(1.5, 2.25)
+
+        hourly_arrivals = np.random.poisson(poisson_lambda)
+        interarrival_time = np.random.exponential(1/poisson_lambda)
+
+        return hourly_arrivals, interarrival_time
+
+    def _hack(self, when, user_list):
+        """
+        Simulate an attack by a random hacker.
+
+        Parameters:
+            - when: The datetime to start the attack.
+            - user_list: The list of users to try to hack.
+
+        Returns:
+            The hacker's IP address and the end time for recording.
+        """
+        hacker_ip = random_ip_generator()
+        random.shuffle(user_list)
+        for user in user_list:
+            when = self._hacker_attempts_login(
+                when=when,
+                source_ip=hacker_ip,
+                username=user
+            )
+        return hacker_ip, when
+
+    def simulate(self):
+        """Simulate according to the parameters defined upon instantiation."""
+        hours_in_date_range = math.floor(
+            (self.end - self.start).total_seconds() / 60 / 60
+        )
+        for offset in range(hours_in_date_range + 1):
+            current = self.start + dt.timedelta(hours=offset)
+
+            # simulate hacker
+            if random.random() < .1:
+                attack_start = current + dt.timedelta(hours=random.random())
+                source_ip, end_time = self._hack(
+                    when=attack_start,
+                    user_list=self.users if random.random() < .65 \
+                    else random.sample(
+                        self.users, random.randint(0, len(self.users))
+                    )
+                )
+                self.hack_log = self.hack_log.append(
+                    dict(start=attack_start, end=end_time, source_ip=source_ip),
+                    ignore_index=True
+                )
+
+            # simulate valid users
+            hourly_arrivals, interarrival_time = self._valid_user_arrivals(current)
+
+            random_user = random.choice(self.users)
+            random_ip = random.choice(self.userbase[random_user])
+
+            for i in range(hourly_arrivals):
+                current += dt.timedelta(hours=interarrival_time)
+                current = self._valid_user_attempts_login(current, random_user)
+
+    @staticmethod
+    def _save(data, filename):
+        """Sort a pandas DataFrame by the datetime and save to a CSV."""
+        data.sort_values('datetime').to_csv(filename, index=False)
+
+    def save_log(self, filename):
+        """Save the log in attempts log to a CSV file."""
+        self._save(self.log, filename)
+
+    def save_hack_log(self, filename):
+        """Save the record of the attacks to a CSV file."""
+        self._save(self.hack_log, filename)
