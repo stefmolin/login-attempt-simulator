@@ -8,7 +8,7 @@ Simulation of regular log in activity on a site and random activity from hackers
 - The attacks come randomly.
 - Valid users come in a Poisson process hourly that depends on the day of the week and the time of day.
 - Valid users have 1-3 IP addresses which are 4 random integers in `[0, 255]` which don't have to be valid.
-- Each hacker will use a single IP address which is generated in the same way the valid user ones are.
+- Hackers will use either a single IP address for an attack or vary the IP address per username they attempt to log in with. This will be determined by the value passed with the `vary_ips` parameter to the `simulate()` method. These IP addresses are generated in the same way the valid user ones are.
 - Both valid users and hackers can make mistakes typing the user names--either forgetting a character or replacing a character with lowercase letter.
 - Valid users are more likely to get their passwords and usernames correct than the hackers.
 - Although highly unlikely, it is possible the hacker has the same IP as a valid user. The hacker may even be a valid user!
@@ -47,10 +47,10 @@ sim.utils.save_user_ips(
 import datetime as dt
 
 start = dt.datetime(2019, 2, 1, 7, 0)
-end = start + dt.timedelta(days=1.5)
+end = start + dt.timedelta(days=10.5)
 
 simulator = sim.LogInAttemptSimulator(user_ip_mapping_file, start, end)
-simulator.simulate()
+simulator.simulate(attack_prob=0.01, try_all_users_prob=0.25, vary_ips=True)
 ```
 
 ### Save Logs for Analysis Later

@@ -285,13 +285,14 @@ class LogInAttemptSimulator:
 
         return hourly_arrivals, interarrival_times
 
-    def _hack(self, when, user_list):
+    def _hack(self, when, user_list, vary_ips):
         """
         Simulate an attack by a random hacker.
 
         Parameters:
             - when: The datetime to start the attack.
             - user_list: The list of users to try to hack.
+            - vary_ips: Whether or not to vary the IP address used for attack.
 
         Returns:
             The hacker's IP address and the end time for recording.
@@ -301,13 +302,24 @@ class LogInAttemptSimulator:
         for user in user_list:
             when = self._hacker_attempts_login(
                 when=when,
-                source_ip=hacker_ip,
+                source_ip=random_ip_generator() if vary_ips else hacker_ip,
                 username=user
             )
         return hacker_ip, when
 
-    def simulate(self):
-        """Simulate according to the parameters defined upon instantiation."""
+    def simulate(self, *, attack_prob, try_all_users_prob, vary_ips):
+        """
+        Simulate log in attempts.
+
+        Parameters:
+            - attack_probs: The probability a hacker will attack in a given hour.
+            - try_all_users_prob: The probability the hacker will try to guess
+                                  the credentials for all users versus using a
+                                  subset of it.
+            - vary_ips: Boolean indicating whether or not to vary the IP
+                        when guessing for each user. When `False`, the hacker
+                        will use the same IP address for the entire attack.
+        """
         hours_in_date_range = math.floor(
             (self.end - self.start).total_seconds() / 60 / 60
         )
@@ -315,14 +327,15 @@ class LogInAttemptSimulator:
             current = self.start + dt.timedelta(hours=offset)
 
             # simulate hacker
-            if random.random() < .1:
+            if random.random() < attack_prob:
                 attack_start = current + dt.timedelta(hours=random.random())
                 source_ip, end_time = self._hack(
                     when=attack_start,
-                    user_list=self.users if random.random() < .65 \
+                    user_list=self.users if random.random() < try_all_users_prob \
                     else random.sample(
                         self.users, random.randint(0, len(self.users))
-                    )
+                    ),
+                    vary_ips=vary_ips
                 )
                 self.hack_log = self.hack_log.append(
                     dict(start=attack_start, end=end_time, source_ip=source_ip),
