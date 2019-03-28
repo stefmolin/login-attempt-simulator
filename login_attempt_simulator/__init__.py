@@ -1,3 +1,3 @@
 """Package for simulating login data."""
 
-from .log_in_attempt_simulator import LogInAttemptSimulator
+from .login_attempt_simulator import LoginAttemptSimulator
