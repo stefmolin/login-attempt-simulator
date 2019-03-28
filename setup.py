@@ -7,7 +7,7 @@ setup(
     author='Stefanie Molin',
     author_email='24376333+stefmolin@users.noreply.github.com',
     license='MIT',
-    url='https://github.com/stefmolin/log-in-attempt-simulator',
+    url='https://github.com/stefmolin/login-attempt-simulator',
     packages=['login_attempt_simulator'],
     install_requires=[
         'numpy>=1.15.2',
