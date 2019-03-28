@@ -1,4 +1,4 @@
-"""Simulator of log in attempts from valid users and hackers."""
+"""Simulator of login attempts from valid users and hackers."""
 
 import calendar
 import datetime as dt
@@ -12,9 +12,9 @@ import pandas as pd
 
 from .utils import random_ip_generator, read_user_ips
 
-class LogInAttemptSimulator:
+class LoginAttemptSimulator:
     """
-    Class for simulating log in attempts from valid and nefarious users.
+    Class for simulating login attempts from valid and nefarious users.
 
     Class attributes:
         - ATTEMPTS_BEFORE_LOCKOUT: Number of consecutive failed attempts
@@ -33,10 +33,10 @@ class LogInAttemptSimulator:
                                       also max attempts hacker will make per
                                       user attempted.
         - valid_user_success_likelihoods: List of probabilities of successful
-                                          log in for valid users. Length of
+                                          login for valid users. Length of
                                           this list is also max attempts user
                                           will make.
-        - log: Pandas DataFrame recording all log in attempts and their outcome.
+        - log: Pandas DataFrame recording all login attempts and their outcome.
         - hack_log: Pandas DataFrame recording when attacks occurred.
         - locked_accounts: List of accounts currently locked.
     """
@@ -63,7 +63,7 @@ class LogInAttemptSimulator:
                                           also max attempts hacker will make per
                                           user attempted.
             - valid_user_success_likelihoods: List of probabilities of successful
-                                              log in for valid users. Length of
+                                              login for valid users. Length of
                                               this list is also max attempts user
                                               will make.
 
@@ -95,7 +95,7 @@ class LogInAttemptSimulator:
 
     def _record(self, when, source_ip, username, success, failure_reason):
         """
-        Record the outcome of a log in attempt.
+        Record the outcome of a login attempt.
 
         Parameters:
             - when: The datetime of the event.
@@ -117,7 +117,7 @@ class LogInAttemptSimulator:
 
     def _hacker_attempts_login(self, when, source_ip, username):
         """
-        Simulates a log in attempt from a attacker.
+        Simulates a login attempt from an attacker.
 
         Parameters:
             - when: The datetime to start trying.
@@ -137,7 +137,7 @@ class LogInAttemptSimulator:
 
     def _valid_user_attempts_login(self, when, username):
         """
-        Simulates a log in attempt from a valid user.
+        Simulates a login attempt from a valid user.
 
         Parameters:
         - when: The datetime to start trying.
@@ -159,7 +159,7 @@ class LogInAttemptSimulator:
                        user_name_accuracy, success_likelihoods
                       ):
         """
-        Simulates a log in attempt, allowing for account lockouts, and
+        Simulates a login attempt, allowing for account lockouts, and
         recording the results.
 
         Parameters:
@@ -309,7 +309,7 @@ class LogInAttemptSimulator:
 
     def simulate(self, *, attack_prob, try_all_users_prob, vary_ips):
         """
-        Simulate log in attempts.
+        Simulate login attempts.
 
         Parameters:
             - attack_probs: The probability a hacker will attack in a given hour.
@@ -358,7 +358,7 @@ class LogInAttemptSimulator:
         data.sort_values(sort_column).to_csv(filename, index=False)
 
     def save_log(self, filename):
-        """Save the log in attempts log to a CSV file."""
+        """Save the login attempts log to a CSV file."""
         self._save(self.log, filename, 'datetime')
 
     def save_hack_log(self, filename):

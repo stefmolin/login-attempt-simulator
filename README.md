@@ -1,5 +1,5 @@
-# Log In Attempt Simulator
-Simulation of regular log in activity on a site and random activity from hackers using brute-force password guessing attacks.
+# Login Attempt Simulator
+Simulation of regular login activity on a site and random activity from hackers using brute-force password guessing attacks.
 
 ## Assumptions
 - The hackers try to avoid an account lockout by only testing a few username-password combinations rather than a full-blown dictionary attack.
@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 ### Create Userbase and IPs
 ```
-import log_in_attempt_simulator as sim
+import login_attempt_simulator as sim
 
 user_base_file = 'user_data/user_base.txt'
 user_ip_mapping_file = 'user_data/user_ips.json'
@@ -49,7 +49,7 @@ import datetime as dt
 start = dt.datetime(2019, 2, 1, 7, 0)
 end = start + dt.timedelta(days=10.5)
 
-simulator = sim.LogInAttemptSimulator(user_ip_mapping_file, start, end)
+simulator = sim.LoginAttemptSimulator(user_ip_mapping_file, start, end)
 simulator.simulate(attack_prob=0.01, try_all_users_prob=0.25, vary_ips=True)
 ```
 

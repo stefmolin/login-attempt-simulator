@@ -1,4 +1,4 @@
-"""Utility functions for the log in attempt simulator."""
+"""Utility functions for the login attempt simulator."""
 
 import itertools
 import json
