@@ -295,7 +295,10 @@ class LoginAttemptSimulator:
             - vary_ips: Whether or not to vary the IP address used for attack.
 
         Returns:
-            The hacker's IP address and the end time for recording.
+            The hacker's starting IP address and the end time of the attack for
+            recording. When the hacker varies the IP address, the log won't record
+            all the IP addresses used to simulate being unable to perfectly label
+            every data point.
         """
         hacker_ip = random_ip_generator()
         random.shuffle(user_list)
