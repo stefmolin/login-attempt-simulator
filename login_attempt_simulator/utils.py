@@ -27,7 +27,7 @@ def random_ip_generator():
     )
 
 def assign_ip_addresses(user_list):
-    """Assign users 1-3 IP fake addresses, returning a dictionary."""
+    """Assign users 1-3 fake IP addresses, returning a dictionary."""
     return {
         user : [
             random_ip_generator() for i in range(random.randint(1, 3))
@@ -35,11 +35,11 @@ def assign_ip_addresses(user_list):
     }
 
 def save_user_ips(user_ip_dict, file):
-    """Save the mapping of users and their IPs to JSON file."""
+    """Save the mapping of users and their IP addresses to JSON file."""
     with open(file, 'w') as file:
         json.dump(user_ip_dict, file)
 
 def read_user_ips(file):
-    """Read in the JSON file of the user-IP mapping."""
+    """Read in the JSON file of the user-IP address mapping."""
     with open(file, 'r') as file:
         return json.loads(file.read())

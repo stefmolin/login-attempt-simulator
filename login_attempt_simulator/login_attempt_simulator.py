@@ -70,7 +70,7 @@ class LoginAttemptSimulator:
         Returns:
             A LogInAttemptSimulator object.
         """
-        self.userbase = read_user_ips(userbase_json_file) # user, ip dict
+        self.userbase = read_user_ips(userbase_json_file) # user, ip address dict
         self.users = [user for user in self.userbase.keys()]
 
         self.start = start
@@ -99,7 +99,7 @@ class LoginAttemptSimulator:
 
         Parameters:
             - when: The datetime of the event.
-            - source_ip: The IP where the attempt came from.
+            - source_ip: The IP address where the attempt came from.
             - username: The username used in the attempt.
             - success: Whether or not the attempt succeeded (boolean).
             - failure_reason: The reason for the failure, if failed.
@@ -121,7 +121,7 @@ class LoginAttemptSimulator:
 
         Parameters:
             - when: The datetime to start trying.
-            - source_ip: The IP where the attempt is coming from.
+            - source_ip: The IP address where the attempt is coming from.
             - username: The username being used in the attempt.
 
         Returns:
@@ -141,7 +141,7 @@ class LoginAttemptSimulator:
 
         Parameters:
         - when: The datetime to start trying.
-        - source_ip: The IP where the attempt is coming from.
+        - source_ip: The IP address where the attempt is coming from.
         - username: The username being used in the attempt.
 
         Returns:
@@ -164,7 +164,7 @@ class LoginAttemptSimulator:
 
         Parameters:
             - when: The datetime to start trying.
-            - source_ip: The IP where the attempt is coming from.
+            - source_ip: The IP address where the attempt is coming from.
             - username: The username being used in the attempt.
             - user_name_accuracy: The probability the username is correct.
             - success_likelihoods: A list of the probablities of the password
