@@ -7,11 +7,11 @@ Simulation of regular login activity on a site and random activity from hackers 
 - Each attack is standalone meaning the hacker carrying out a given attack doesn't keep track of which username-password combinations worked and which didn't, but each hacker (1 per attack) will choose to try to guess all the users or some subset of it.
 - The attacks come randomly.
 - Valid users come in a Poisson process hourly that depends on the day of the week and the time of day.
-- Valid users have 1-3 IP addresses which are 4 random integers in `[0, 255]` which don't have to be valid.
+- Valid users have 1-3 IP addresses which are 4 random integers in `[0, 255]`.
 - Hackers will use either a single IP address for an attack or vary the IP address per username they attempt to log in with. This will be determined by the value passed with the `vary_ips` parameter to the `simulate()` method. These IP addresses are generated in the same way the valid user ones are.
 - Both valid users and hackers can make mistakes typing the user names--either forgetting a character or replacing a character with lowercase letter.
 - Valid users are more likely to get their passwords and usernames correct than the hackers.
-- Although highly unlikely, it is possible the hacker has the same IP as a valid user. The hacker may even be a valid user!
+- Although highly unlikely, it is possible the hacker has the same IP address as a valid user. The hacker may even be a valid user!
 
 ## Setup
 ```
@@ -34,7 +34,7 @@ user_ip_mapping_file = 'user_data/user_ips.json'
 # create usernames and write to file
 sim.utils.make_userbase(user_base_file)
 
-# create one or more IPs per user and save mapping to file
+# create one or more IP addresses per user and save mapping to file
 valid_users = sim.utils.get_valid_users(user_base_file)
 sim.utils.save_user_ips(
     sim.utils.assign_ip_addresses(valid_users), user_ip_mapping_file

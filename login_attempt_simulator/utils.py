@@ -1,5 +1,6 @@
 """Utility functions for the login attempt simulator."""
 
+import ipaddress
 import itertools
 import json
 import random
@@ -21,10 +22,15 @@ def get_valid_users(user_base_file):
         return [user.strip() for user in file.readlines()]
 
 def random_ip_generator():
-    """Randomly generate a fake IP address. Not all these will be valid."""
-    return '%d.%d.%d.%d' % tuple(
-        random.randint(0, 255) for i in range(4)
-    )
+    """Randomly generate a fake IP address. Not all these will be routable."""
+    try:
+        ip_address = ipaddress.IPv4Address('%d.%d.%d.%d' % tuple(
+            random.randint(0, 255) for i in range(4)
+        ))
+    except ipaddress.AddressValueError:
+        ip_address = random_ip_generator()
+    return ip_address if not ip_address.is_private \
+        else random_ip_generator()
 
 def assign_ip_addresses(user_list):
     """Assign users 1-3 fake IP addresses, returning a dictionary."""
