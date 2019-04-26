@@ -22,7 +22,7 @@ def get_valid_users(user_base_file):
         return [user.strip() for user in file.readlines()]
 
 def random_ip_generator():
-    """Randomly generate a fake IP address. Not all these will be routable."""
+    """Randomly generate a fake IP address."""
     try:
         ip_address = ipaddress.IPv4Address('%d.%d.%d.%d' % tuple(
             random.randint(0, 255) for i in range(4)
