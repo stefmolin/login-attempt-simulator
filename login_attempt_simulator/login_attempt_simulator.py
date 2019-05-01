@@ -48,7 +48,7 @@ class LoginAttemptSimulator:
 
     def __init__(self, userbase_json_file, start, end=None, *,
                  hacker_success_likelihoods=[.25, .45],
-                 valid_user_success_likelihoods=[.75, .8, .5]
+                 valid_user_success_likelihoods=[.99, .99, .95]
                 ):
         """
         Create a simulator.
@@ -151,7 +151,7 @@ class LoginAttemptSimulator:
             when=when,
             source_ip=random.choice(self.userbase[username]),
             username=username,
-            user_name_accuracy=random.gauss(mu=0.8, sigma=0.1),
+            user_name_accuracy=random.gauss(mu=1.01, sigma=0.01),
             success_likelihoods=self.valid_user_success_likelihoods
         )
 
@@ -200,8 +200,7 @@ class LoginAttemptSimulator:
                         username = correct_username
                     continue
 
-                probability_success = random.random()
-                if random.random() < success_likelihoods[i]:
+                if random.random() <= success_likelihoods[i]:
                     # successfully logs in
                     recorder(
                         when=current,
