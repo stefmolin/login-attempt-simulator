@@ -29,7 +29,7 @@ def random_ip_generator():
         ))
     except ipaddress.AddressValueError:
         ip_address = random_ip_generator()
-    return ip_address if not ip_address.is_private \
+    return str(ip_address) if not ip_address.is_private \
         else random_ip_generator()
 
 def assign_ip_addresses(user_list):

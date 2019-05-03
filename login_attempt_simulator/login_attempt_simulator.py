@@ -48,7 +48,8 @@ class LoginAttemptSimulator:
 
     def __init__(self, userbase_json_file, start, end=None, *,
                  hacker_success_likelihoods=[.25, .45],
-                 valid_user_success_likelihoods=[.99, .99, .95]
+                 valid_user_success_likelihoods=[.99, .99, .95],
+                 seed=None
                 ):
         """
         Create a simulator.
@@ -66,9 +67,10 @@ class LoginAttemptSimulator:
                                               login for valid users. Length of
                                               this list is also max attempts user
                                               will make.
+            - seed: Value to use as a seed for random number generation.
 
         Returns:
-            A LogInAttemptSimulator object.
+            A LoginAttemptSimulator object.
         """
         self.userbase = read_user_ips(userbase_json_file) # user, ip address dict
         self.users = [user for user in self.userbase.keys()]
@@ -92,6 +94,10 @@ class LoginAttemptSimulator:
         )
 
         self.locked_accounts = []
+
+        # we are using numpy and random for random numbers so we set 2 seeds:
+        random.seed(seed)
+        np.random.seed(seed)
 
     def _record(self, when, source_ip, username, success, failure_reason):
         """
