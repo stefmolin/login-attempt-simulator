@@ -16,7 +16,7 @@ Simulation of regular login activity on a site and random activity from hackers 
 ## Setup
 ```
 # should install requirements.txt packages
-pip install -e log-in-attempt-simulator # path to top level where setup.py is
+pip install -e login-attempt-simulator # path to top level where setup.py is
 
 # if not, install them explicitly
 pip install -r requirements.txt
