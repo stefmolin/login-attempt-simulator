@@ -4,8 +4,8 @@ Simulation of regular login activity on a site and random activity from hackers 
 ## Assumptions
 The simulator makes the following assumptions about valid users of the website:
 
-- Valid users come according to a Poisson process hourly that depends on the day of the week and the time of day. A Poisson process models arrivals per unit time (hour here) as a Poisson distribution with mean λ (lambda) and the interarrival times are exponential distributed with mean 1/λ.
-- Valid users connect from 1-3 IP addresses (unique identifier for devices using the Internet), which are 4 random integers in ``[0, 255]`` separated by periods. It is possible, although highly unlikely, that two valid users have the same IP address.
+- Valid users come according to a Poisson process with an hourly rate that depends on the day of the week and the time of day. A Poisson process models arrivals per unit time (hour here) as a Poisson distribution with mean λ (lambda) and the interarrival times are exponential distributed with mean 1/λ.
+- Valid users connect from 1-3 IP addresses (unique identifier for devices using the Internet), which are 4 random integers in `[0, 255]` separated by periods. It is possible, although highly unlikely, that two valid users have the same IP address.
 - Valid users are unlikely to make many mistakes entering their credentials.
 
 The simulator makes the following assumptions about the hackers:

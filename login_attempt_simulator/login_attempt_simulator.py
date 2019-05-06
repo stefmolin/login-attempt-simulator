@@ -173,7 +173,7 @@ class LoginAttemptSimulator:
             - source_ip: The IP address where the attempt is coming from.
             - username: The username being used in the attempt.
             - user_name_accuracy: The probability the username is correct.
-            - success_likelihoods: A list of the probablities of the password
+            - success_likelihoods: A list of the probabilities of the password
                                    being correct. The number of attempts to
                                    log in will be equal to the length of this
                                    list.
