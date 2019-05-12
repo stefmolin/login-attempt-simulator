@@ -362,7 +362,7 @@ class LoginAttemptSimulator:
 
     @staticmethod
     def _save(data, filename, sort_column):
-        """Sort a pandas DataFrame by the datetime and save to a CSV."""
+        """Sort a pandas DataFrame by the datetime and save to a CSV file."""
         data.sort_values(sort_column).to_csv(filename, index=False)
 
     def save_log(self, filename):
