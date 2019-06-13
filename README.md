@@ -20,47 +20,48 @@ The simulator makes the following assumptions about the hackers:
 - Although highly unlikely, it is possible the hacker has the same IP address as a valid user. The hacker may even be a valid user.
 
 ## Setup
-```
+```shell
 # should install requirements.txt packages
-pip install -e login-attempt-simulator # path to top level where setup.py is
+$ pip install -e login-attempt-simulator # path to top level where setup.py is
 
 # if not, install them explicitly
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 ## Usage
 
 ### Create Userbase and IPs
-```
-import login_attempt_simulator as sim
+```python
+>>> import login_attempt_simulator as sim
 
-user_base_file = 'user_data/user_base.txt'
-user_ip_mapping_file = 'user_data/user_ips.json'
+>>> user_base_file = 'user_data/user_base.txt'
+>>> user_ip_mapping_file = 'user_data/user_ips.json'
 
 # create usernames and write to file
-sim.utils.make_userbase(user_base_file)
+>>> sim.utils.make_userbase(user_base_file)
 
 # create one or more IP addresses per user and save mapping to file
-valid_users = sim.utils.get_valid_users(user_base_file)
-sim.utils.save_user_ips(
-    sim.utils.assign_ip_addresses(valid_users), user_ip_mapping_file
-)
+>>> valid_users = sim.utils.get_valid_users(user_base_file)
+>>> sim.utils.save_user_ips(
+...     sim.utils.assign_ip_addresses(valid_users),
+...     user_ip_mapping_file
+... )
 ```
 
 ### Simulate Over Time Period
-*Note you can provide your own success probabilities when you instantiate the LogInAttemptSimulator.*
-```
-import datetime as dt
+*Note you can provide your own success probabilities when you instantiate the `LoginAttemptSimulator`.*
+```python
+>>> import datetime as dt
 
-start = dt.datetime(2019, 2, 1, 7, 0)
-end = start + dt.timedelta(days=10.5)
+>>> start = dt.datetime(2019, 2, 1, 7, 0)
+>>> end = start + dt.timedelta(days=10.5)
 
-simulator = sim.LoginAttemptSimulator(user_ip_mapping_file, start, end)
-simulator.simulate(attack_prob=0.01, try_all_users_prob=0.25, vary_ips=True)
+>>> simulator = sim.LoginAttemptSimulator(user_ip_mapping_file, start, end)
+>>> simulator.simulate(attack_prob=0.01, try_all_users_prob=0.25, vary_ips=True)
 ```
 
 ### Save Logs for Analysis Later
-```
-simulator.save_hack_log('logs/attacks.csv')
-simulator.save_log('logs/log.csv')
+```python
+>>> simulator.save_hack_log('logs/attacks.csv')
+>>> simulator.save_log('logs/log.csv')
 ```
