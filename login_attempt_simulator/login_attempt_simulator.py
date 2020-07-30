@@ -48,7 +48,7 @@ class LoginAttemptSimulator:
 
     def __init__(self, userbase_json_file, start, end=None, *,
                  hacker_success_likelihoods=[.25, .45],
-                 valid_user_success_likelihoods=[.99, .99, .95],
+                 valid_user_success_likelihoods=[.87, .93, .95],
                  seed=None
                 ):
         """
@@ -276,12 +276,12 @@ class LoginAttemptSimulator:
 
         if work_time:
             # hours 9-5 on work days get higher lambda concentrated near 2.75
-            poisson_lambda = random.triangular(1.5, 2.75, 5)
+            poisson_lambda = random.triangular(1.5, 5, 2.75)
         elif late_night:
             # hours in middle of night get lower lambda
-            poisson_lambda = random.uniform(0.0, 1.0)
+            poisson_lambda = random.uniform(0.0, 5.0)
         else:
-            poisson_lambda = random.uniform(1.5, 2.25)
+            poisson_lambda = random.uniform(1.5, 4.25)
 
         hourly_arrivals = np.random.poisson(poisson_lambda)
         interarrival_times = np.random.exponential(
