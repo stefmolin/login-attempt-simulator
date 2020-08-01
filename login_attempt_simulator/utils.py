@@ -6,8 +6,8 @@ import json
 import random
 import string
 
-def make_userbase(out_file):
-    """Generate a userbase and save it to a file."""
+def make_user_base(out_file):
+    """Generate a user base and save it to a file."""
     with open(out_file, 'w') as user_base:
         for first, last in itertools.product(
             string.ascii_lowercase, ['smith', 'jones', 'kim', 'lopez', 'brown']
@@ -17,7 +17,7 @@ def make_userbase(out_file):
             user_base.write(account + '\n')
 
 def get_valid_users(user_base_file):
-    """Read in users from the userbase file."""
+    """Read in users from the user base file."""
     with open(user_base_file, 'r') as file:
         return [user.strip() for user in file.readlines()]
 
