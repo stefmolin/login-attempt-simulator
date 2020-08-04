@@ -24,8 +24,8 @@ class LoginAttemptSimulator:
         - WRONG_PASSWORD: Error message for log when password is wrong.
 
     Instance attributes:
-        - userbase: Dictionary mapping usernames to their IP addresses.
-        - users: The list of usernames in the userbase.
+        - user_base: Dictionary mapping usernames to their IP addresses.
+        - users: The list of usernames in the user_base.
         - start: The start datetime for the simulation.
         - end: The end datetime for the simulation.
         - hacker_success_likelihoods: List of probabilities of successful log
@@ -46,7 +46,7 @@ class LoginAttemptSimulator:
     WRONG_USERNAME = 'error_wrong_username'
     WRONG_PASSWORD = 'error_wrong_password'
 
-    def __init__(self, userbase_json_file, start, end=None, *,
+    def __init__(self, user_base_json_file, start, end=None, *,
                  hacker_success_likelihoods=[.25, .45],
                  valid_user_success_likelihoods=[.87, .93, .95],
                  seed=None
@@ -55,7 +55,7 @@ class LoginAttemptSimulator:
         Create a simulator.
 
         Parameters:
-            - userbase_json_file: The JSON file name of the mapping of
+            - user_base_json_file: The JSON file name of the mapping of
                                   usernames to their IPs.
             - start: The start datetime for the simulation.
             - end: The end datetime for the simulation.
@@ -72,8 +72,8 @@ class LoginAttemptSimulator:
         Returns:
             A LoginAttemptSimulator object.
         """
-        self.userbase = read_user_ips(userbase_json_file) # user, ip address dict
-        self.users = [user for user in self.userbase.keys()]
+        self.user_base = read_user_ips(user_base_json_file) # user, ip address dict
+        self.users = [user for user in self.user_base.keys()]
 
         self.start = start
         self.end = end if end else self.start + dt.timedelta(
@@ -137,7 +137,7 @@ class LoginAttemptSimulator:
             when=when,
             source_ip=source_ip,
             username=username,
-            user_name_accuracy=random.gauss(mu=0.35, sigma=0.5),
+            username_accuracy=random.gauss(mu=0.35, sigma=0.5),
             success_likelihoods=self.hacker_success_likelihoods
         )
 
@@ -155,14 +155,14 @@ class LoginAttemptSimulator:
         """
         return self._attempt_login(
             when=when,
-            source_ip=random.choice(self.userbase[username]),
+            source_ip=random.choice(self.user_base[username]),
             username=username,
-            user_name_accuracy=random.gauss(mu=1.01, sigma=0.01),
+            username_accuracy=random.gauss(mu=1.01, sigma=0.01),
             success_likelihoods=self.valid_user_success_likelihoods
         )
 
     def _attempt_login(self, when, source_ip, username,
-                       user_name_accuracy, success_likelihoods
+                       username_accuracy, success_likelihoods
                       ):
         """
         Simulates a login attempt, allowing for account lockouts, and
@@ -172,7 +172,7 @@ class LoginAttemptSimulator:
             - when: The datetime to start trying.
             - source_ip: The IP address where the attempt is coming from.
             - username: The username being used in the attempt.
-            - user_name_accuracy: The probability the username is correct.
+            - username_accuracy: The probability the username is correct.
             - success_likelihoods: A list of the probabilities of the password
                                    being correct. The number of attempts to
                                    log in will be equal to the length of this
@@ -184,7 +184,7 @@ class LoginAttemptSimulator:
         current = when
         recorder = partial(self._record, source_ip=source_ip)
 
-        if random.random() > user_name_accuracy:
+        if random.random() > username_accuracy:
             # username will be provided incorrectly
             correct_username = username
             username = self._distort_username(username)
@@ -201,7 +201,7 @@ class LoginAttemptSimulator:
                         success=False,
                         failure_reason=self.WRONG_USERNAME
                     )
-                    if random.random() <= user_name_accuracy:
+                    if random.random() <= username_accuracy:
                         # corrects username
                         username = correct_username
                     continue
@@ -354,7 +354,7 @@ class LoginAttemptSimulator:
             hourly_arrivals, interarrival_times = self._valid_user_arrivals(current)
 
             random_user = random.choice(self.users)
-            random_ip = random.choice(self.userbase[random_user])
+            random_ip = random.choice(self.user_base[random_user])
 
             for i in range(hourly_arrivals):
                 current += dt.timedelta(hours=interarrival_times[i])
