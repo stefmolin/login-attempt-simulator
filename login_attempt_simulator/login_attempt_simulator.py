@@ -114,11 +114,11 @@ class LoginAttemptSimulator:
             None, the `log` attribute is updated.
         """
         self.log = self.log.append({
-            'datetime' : when,
-            'source_ip' : source_ip,
-            'username' : username,
-            'success' : success,
-            'failure_reason' : failure_reason
+            'datetime': when,
+            'source_ip': source_ip,
+            'username': username,
+            'success': success,
+            'failure_reason': failure_reason
         }, ignore_index=True)
 
     def _hacker_attempts_login(self, when, source_ip, username):
