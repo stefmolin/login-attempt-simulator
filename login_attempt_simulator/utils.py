@@ -25,7 +25,7 @@ def random_ip_generator():
     """Randomly generate a fake IP address."""
     try:
         ip_address = ipaddress.IPv4Address('%d.%d.%d.%d' % tuple(
-            random.randint(0, 255) for i in range(4)
+            random.randint(0, 255) for _ in range(4)
         ))
     except ipaddress.AddressValueError:
         ip_address = random_ip_generator()
@@ -36,7 +36,7 @@ def assign_ip_addresses(user_list):
     """Assign users 1-3 fake IP addresses, returning a dictionary."""
     return {
         user: [
-            random_ip_generator() for i in range(random.randint(1, 3))
+            random_ip_generator() for _ in range(random.randint(1, 3))
         ] for user in user_list
     }
 
