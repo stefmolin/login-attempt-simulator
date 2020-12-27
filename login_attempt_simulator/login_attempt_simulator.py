@@ -105,7 +105,7 @@ class LoginAttemptSimulator:
             - when: The datetime of the event.
             - source_ip: The IP address where the attempt came from.
             - username: The username used in the attempt.
-            - success: Whether or not the attempt succeeded (boolean).
+            - success: Whether or not the attempt succeeded (Boolean).
             - failure_reason: The reason for the failure, if failed.
 
         Returns:
