@@ -76,9 +76,7 @@ class LoginAttemptSimulator:
         self.users = [user for user in self.user_base.keys()]
 
         self.start = start
-        self.end = end if end else self.start + dt.timedelta(
-            days=random.uniform(1, 50)
-        )
+        self.end = end if end else self.start + dt.timedelta(days=random.uniform(1, 50))
 
         self.hacker_success_likelihoods = hacker_success_likelihoods
         self.valid_user_success_likelihoods = valid_user_success_likelihoods
