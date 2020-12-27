@@ -338,9 +338,7 @@ class LoginAttemptSimulator:
                 source_ip, end_time = self._hack(
                     when=attack_start,
                     user_list=self.users if random.random() < try_all_users_prob \
-                    else random.sample(
-                        self.users, random.randint(0, len(self.users))
-                    ),
+                        else random.sample(self.users, random.randint(0, len(self.users))),
                     vary_ips=vary_ips
                 )
                 self.hack_log = self.hack_log.append(
@@ -360,7 +358,7 @@ class LoginAttemptSimulator:
 
     @staticmethod
     def _save(data, filename, sort_column):
-        """Sort a pandas DataFrame by the datetime and save to a CSV file."""
+        """Sort a `pandas.DataFrame` by the datetime and save to a CSV file."""
         data.sort_values(sort_column).to_csv(filename, index=False)
 
     def save_log(self, filename):
