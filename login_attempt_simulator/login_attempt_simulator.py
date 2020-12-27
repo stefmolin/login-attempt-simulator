@@ -119,46 +119,6 @@ class LoginAttemptSimulator:
             'failure_reason': failure_reason
         }, ignore_index=True)
 
-    def _hacker_attempts_login(self, when, source_ip, username):
-        """
-        Simulates a login attempt from an attacker.
-
-        Parameters:
-            - when: The datetime to start trying.
-            - source_ip: The IP address where the attempt is coming from.
-            - username: The username being used in the attempt.
-
-        Returns:
-            The datetime after trying.
-        """
-        return self._attempt_login(
-            when=when,
-            source_ip=source_ip,
-            username=username,
-            username_accuracy=random.gauss(mu=0.35, sigma=0.5),
-            success_likelihoods=self.hacker_success_likelihoods
-        )
-
-    def _valid_user_attempts_login(self, when, username):
-        """
-        Simulates a login attempt from a valid user.
-
-        Parameters:
-        - when: The datetime to start trying.
-        - source_ip: The IP address where the attempt is coming from.
-        - username: The username being used in the attempt.
-
-        Returns:
-            The datetime after trying.
-        """
-        return self._attempt_login(
-            when=when,
-            source_ip=random.choice(self.user_base[username]),
-            username=username,
-            username_accuracy=random.gauss(mu=1.01, sigma=0.01),
-            success_likelihoods=self.valid_user_success_likelihoods
-        )
-
     def _attempt_login(self, when, source_ip, username,
                        username_accuracy, success_likelihoods
                       ):
@@ -236,6 +196,46 @@ class LoginAttemptSimulator:
             if random.random() >= .5:
                 self.locked_accounts.remove(username)
         return current
+    
+    def _hacker_attempts_login(self, when, source_ip, username):
+        """
+        Simulates a login attempt from an attacker.
+
+        Parameters:
+            - when: The datetime to start trying.
+            - source_ip: The IP address where the attempt is coming from.
+            - username: The username being used in the attempt.
+
+        Returns:
+            The datetime after trying.
+        """
+        return self._attempt_login(
+            when=when,
+            source_ip=source_ip,
+            username=username,
+            username_accuracy=random.gauss(mu=0.35, sigma=0.5),
+            success_likelihoods=self.hacker_success_likelihoods
+        )
+
+    def _valid_user_attempts_login(self, when, username):
+        """
+        Simulates a login attempt from a valid user.
+
+        Parameters:
+        - when: The datetime to start trying.
+        - source_ip: The IP address where the attempt is coming from.
+        - username: The username being used in the attempt.
+
+        Returns:
+            The datetime after trying.
+        """
+        return self._attempt_login(
+            when=when,
+            source_ip=random.choice(self.user_base[username]),
+            username=username,
+            username_accuracy=random.gauss(mu=1.01, sigma=0.01),
+            success_likelihoods=self.valid_user_success_likelihoods
+        )
 
     @staticmethod
     def _distort_username(username):
