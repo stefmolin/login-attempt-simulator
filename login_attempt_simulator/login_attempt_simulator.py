@@ -70,7 +70,7 @@ class LoginAttemptSimulator:
             - seed: Value to use as a seed for random number generation.
 
         Returns:
-            A LoginAttemptSimulator object.
+            A `LoginAttemptSimulator` object.
         """
         self.user_base = read_user_ips(user_base_json_file) # user, ip address dict
         self.users = [user for user in self.user_base.keys()]
