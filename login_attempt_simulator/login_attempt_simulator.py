@@ -47,8 +47,8 @@ class LoginAttemptSimulator:
     WRONG_PASSWORD = 'error_wrong_password'
 
     def __init__(self, user_base_json_file, start, end=None, *,
-                 hacker_success_likelihoods=[.25, .45],
-                 valid_user_success_likelihoods=[.87, .93, .95],
+                 attacker_success_probs=[.25, .45],
+                 valid_user_success_probs=[.87, .93, .95],
                  seed=None
                 ):
         """
@@ -59,14 +59,14 @@ class LoginAttemptSimulator:
                                   usernames to their IPs.
             - start: The start datetime for the simulation.
             - end: The end datetime for the simulation.
-            - hacker_success_likelihoods: List of probabilities of successful log
-                                          in for hacker. Length of this list is
-                                          also max attempts hacker will make per
-                                          user attempted.
-            - valid_user_success_likelihoods: List of probabilities of successful
-                                              login for valid users. Length of
-                                              this list is also max attempts user
-                                              will make.
+            - attacker_success_probs: List of probabilities of successful log
+                                      in for hacker. Length of this list is
+                                      also max attempts hacker will make per
+                                      user attempted.
+            - valid_user_success_probs: List of probabilities of successful
+                                        login for valid users. Length of
+                                        this list is also max attempts user
+                                        will make.
             - seed: Value to use as a seed for random number generation.
 
         Returns:
@@ -78,8 +78,8 @@ class LoginAttemptSimulator:
         self.start = start
         self.end = end if end else self.start + dt.timedelta(days=random.uniform(1, 50))
 
-        self.hacker_success_likelihoods = hacker_success_likelihoods
-        self.valid_user_success_likelihoods = valid_user_success_likelihoods
+        self.hacker_success_likelihoods = attacker_success_probs
+        self.valid_user_success_likelihoods = valid_user_success_probs
 
         self.log = pd.DataFrame(
             columns=[
