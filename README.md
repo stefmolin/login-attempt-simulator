@@ -33,7 +33,7 @@ $ pip install -r requirements.txt
 
 ## Usage
 
-### Create Userbase and IPs
+### Create User Base and IPs
 ```python
 >>> import login_attempt_simulator as sim
 
@@ -41,7 +41,7 @@ $ pip install -r requirements.txt
 >>> user_ip_mapping_file = 'user_data/user_ips.json'
 
 # create usernames and write to file
->>> sim.utils.make_userbase(user_base_file)
+>>> sim.utils.make_user_base(user_base_file)
 
 # create one or more IP addresses per user and save mapping to file
 >>> valid_users = sim.utils.get_valid_users(user_base_file)
